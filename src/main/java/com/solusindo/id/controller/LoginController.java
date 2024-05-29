@@ -36,7 +36,6 @@ public class LoginController {
     @PostMapping("/username")
     @Operation(summary = "Login", method = "POST")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest servletRequest) {
-
         LoginResponse dto = service.login(request, servletRequest);
         return ResponseEntity.ok(dto);
     }

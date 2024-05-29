@@ -1,9 +1,16 @@
 package com.solusindo.id.utils;
 
+import com.solusindo.id.service.UserLoginService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +21,7 @@ import java.util.function.Function;
 
 
 @Component
+@Slf4j
 public class JwtUtil {
 
     @Value("${jwt.secret-key}")
@@ -21,6 +29,9 @@ public class JwtUtil {
 
     @Value("${jwt.expire-time}")
     public Long jwtExpireTime;
+
+    @Autowired
+    private UserLoginService userService;
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -39,9 +50,14 @@ public class JwtUtil {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+    private boolean isTokenExpired(String token) {
+        try {
+            final Date expiration = getExpirationDateFromToken(token);
+            return expiration.before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid or expired JWT token", e);
+            return true;
+        }
     }
 
     // curenty does do not have userDetailyet
@@ -60,10 +76,25 @@ public class JwtUtil {
                 .compact();
     }
 
-    //validate token
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public UsernamePasswordAuthenticationToken getAuthentication(String token) {
+        if (token == null) {
+            return null;
+        }
+        if (isTokenExpired(token)){
+            return null;
+        }
+        String username = getUsernameFromToken(token);
+
+        UserDetails userDetail = userService.loadUserByUsername(username);
+        log.info(username);
+        return new UsernamePasswordAuthenticationToken(username, null, userDetail.getAuthorities());
     }
+
+    public String getToken(HttpServletRequest request){
+        var token = request.getHeader("Authorization");
+        if (token == null) return null;
+        return token.replace("Bearer ", "");
+    }
+
 }
 

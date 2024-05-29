@@ -10,15 +10,21 @@ import com.solusindo.id.repository.UserLoginRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class UserLoginService {
+public class UserLoginService implements UserDetailsService {
 
     // TODO Password hashing, email and username validation
     // TODO Error handling if enough time
@@ -84,6 +90,15 @@ public class UserLoginService {
         repository.save(entity);
 
         return new UserLoginDto(entity);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserLoginEntity userLogin = repository.findByUsernameAndDeletedFalse(username)
+                .orElseThrow( () -> new ProcessException("Username Not Found")
+                );
+        return new User(userLogin.getUsername(), userLogin.getPassword(),
+                    new ArrayList<>());
     }
 
     public void signUpValidation(UserLoginEntity entity) throws IllegalArgumentException {
