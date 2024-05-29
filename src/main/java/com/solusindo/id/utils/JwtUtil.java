@@ -86,7 +86,6 @@ public class JwtUtil {
         String username = getUsernameFromToken(token);
 
         UserDetails userDetail = userService.loadUserByUsername(username);
-        log.info(username);
         return new UsernamePasswordAuthenticationToken(username, null, userDetail.getAuthorities());
     }
 
