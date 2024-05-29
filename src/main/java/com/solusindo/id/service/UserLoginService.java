@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -25,8 +26,15 @@ public class UserLoginService {
     @Autowired
     private UserLoginRepository repository;
 
+//    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
     public UserLoginDto create(SignUpRequest request, HttpServletRequest servletRequest){
         UserLoginEntity entity = request.mapToEntity();
+        signUpValidation(entity);
+//        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+
+
         entity.setCreatedBy(Default.USER);
         entity.setCreatedDate(new Date());
 
@@ -39,7 +47,6 @@ public class UserLoginService {
     public UserLoginDto update(UserLoginDto request, HttpServletRequest servletRequest) {
         UserLoginEntity entity = repository.findByUsernameAndDeletedFalse(request.getUsername()).orElseThrow();
 
-        entity.setEmail(request.getEmail());
         entity.setAge(request.getAge());
 
         entity.setModifiedBy(request.getUsername());
@@ -76,6 +83,32 @@ public class UserLoginService {
         repository.save(entity);
 
         return new UserLoginDto(entity);
+    }
+
+    public void signUpValidation(UserLoginEntity entity) throws IllegalArgumentException {
+        if (!isValidEmail(entity.getUsername())) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if (!isValidPassword(entity.getPassword())) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long, contain at least one digit, one lowercase letter, one uppercase letter, and one special character.");
+        }
+
+        if (entity.getAge() < 18) {
+            throw new IllegalArgumentException("Age must be 18 or older");
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,}$";
+        Pattern pattern = Pattern.compile(passwordRegex);
+        return pattern.matcher(password).matches();
     }
 
 

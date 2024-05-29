@@ -1,11 +1,12 @@
 package com.solusindo.id.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.processing.Pattern;
 
 
 @Data
@@ -20,15 +21,14 @@ public class UserLoginEntity extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Email
     @Column(name = "username", unique = true, nullable = false)
     private String username;
-
-    @Column(name = "email", unique = true, nullable = false)
-    private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Min(value = 18)
     @Column(name = "age", nullable = false)
     private int age;
 }

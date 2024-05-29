@@ -21,14 +21,12 @@ public class SignUpRequest implements Serializable {
     private static final long serialVersionUID = -4419529611761094688L;
 
     private String username;
-    private String email;
     private String password;
     private int age;
 
     public UserLoginEntity mapToEntity(){
         return UserLoginEntity.builder()
                 .username(this.username)
-                .email(this.email)
                 .password(this.password)
                 .age(this.age)
                 .build();

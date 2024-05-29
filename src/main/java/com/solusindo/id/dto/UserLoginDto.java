@@ -22,13 +22,11 @@ public class UserLoginDto implements Serializable {
 
     private Long id;
     private String username;
-    private String email;
     private int age;
 
     public UserLoginDto(UserLoginEntity entity) {
         this.id = entity.getId();
         this.username = entity.getUsername();
-        this.email = entity.getEmail();
         this.age = entity.getAge();
     }
 }
