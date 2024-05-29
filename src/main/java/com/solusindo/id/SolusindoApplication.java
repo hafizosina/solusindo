@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "com.solusindo.id")
-public class IdApplication {
+public class SolusindoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(IdApplication.class, args);
+		SpringApplication.run(SolusindoApplication.class, args);
 	}
 
 }
