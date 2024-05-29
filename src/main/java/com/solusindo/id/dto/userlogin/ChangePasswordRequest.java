@@ -1,4 +1,4 @@
-package com.solusindo.id.dto;
+package com.solusindo.id.dto.userlogin;
 
 
 import lombok.AllArgsConstructor;

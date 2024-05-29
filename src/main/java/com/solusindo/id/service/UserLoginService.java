@@ -1,9 +1,10 @@
 package com.solusindo.id.service;
 
+import com.solusindo.id.exception.ProcessException;
 import com.solusindo.id.constant.Default;
-import com.solusindo.id.dto.ChangePasswordRequest;
-import com.solusindo.id.dto.SignUpRequest;
-import com.solusindo.id.dto.UserLoginDto;
+import com.solusindo.id.dto.userlogin.ChangePasswordRequest;
+import com.solusindo.id.dto.userlogin.SignUpRequest;
+import com.solusindo.id.dto.userlogin.UserLoginDto;
 import com.solusindo.id.model.UserLoginEntity;
 import com.solusindo.id.repository.UserLoginRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -87,15 +88,15 @@ public class UserLoginService {
 
     public void signUpValidation(UserLoginEntity entity) throws IllegalArgumentException {
         if (!isValidEmail(entity.getUsername())) {
-            throw new IllegalArgumentException("Invalid email format");
+            throw new ProcessException("Invalid email format");
         }
 
         if (!isValidPassword(entity.getPassword())) {
-            throw new IllegalArgumentException("Password must be at least 6 characters long, contain at least one digit, one lowercase letter, one uppercase letter, and one special character.");
+            throw new ProcessException("Password must be at least 6 characters long, contain at least one digit, one lowercase letter, one uppercase letter, and one special character.");
         }
 
         if (entity.getAge() < 18) {
-            throw new IllegalArgumentException("Age must be 18 or older");
+            throw new ProcessException("Age must be 18 or older");
         }
     }
 
