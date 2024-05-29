@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,22 +26,18 @@ import java.util.regex.Pattern;
 @Service
 @Slf4j
 public class UserLoginService implements UserDetailsService {
-
-    // TODO Password hashing, email and username validation
-    // TODO Error handling if enough time
     // TODO event logging (filter?, annotation?)
 
     @Autowired
     private UserLoginRepository repository;
 
-//    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
     public UserLoginDto create(SignUpRequest request, HttpServletRequest servletRequest){
         UserLoginEntity entity = request.mapToEntity();
         signUpValidation(entity);
-//        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
 
         entity.setCreatedBy(Default.USER);
         entity.setCreatedDate(new Date());
@@ -112,6 +109,10 @@ public class UserLoginService implements UserDetailsService {
 
         if (entity.getAge() < 18) {
             throw new ProcessException("Age must be 18 or older");
+        }
+
+        if (repository.existsByUsernameAndDeletedFalse(entity.getUsername())){
+            throw new ProcessException("Username already exists");
         }
     }
 

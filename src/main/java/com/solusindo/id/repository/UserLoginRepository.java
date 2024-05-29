@@ -10,4 +10,7 @@ import java.util.Optional;
 @Repository
 public interface UserLoginRepository extends JpaRepository<UserLoginEntity, Long>, JpaSpecificationExecutor<UserLoginEntity> {
     Optional<UserLoginEntity> findByUsernameAndDeletedFalse(String username);
+
+
+    boolean existsByUsernameAndDeletedFalse(String username);
 }
