@@ -10,6 +10,9 @@ public class Default {
             "/actuator/**",
             "/swagger-ui/**",
             "/login/**",
-            "/error"
+            "/error",
+            "/login.**",
+            "/"
+
     };
 }
