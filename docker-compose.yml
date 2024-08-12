@@ -1,0 +1,13 @@
+version : "3.8"
+
+services :
+
+  db :
+    image: postgres
+    container_name: db-solusindo
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: zhenzhu
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: solusindo2
